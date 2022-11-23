@@ -2,8 +2,13 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.core.validators import MinValueValidator
 
+from django.dispatch import receiver
+from django.db.models.signals import post_save, pre_save, pre_init, post_init
 
-class Company(models.Model):
+
+from django.core.exceptions import ValidationError
+
+class Empresa(models.Model):
     name = models.CharField(
         'name', 
         max_length=200
@@ -11,7 +16,7 @@ class Company(models.Model):
     email = models.EmailField('email')
     owner = models.ForeignKey(
         User, 
-        related_name='company',
+        related_name='empresa',
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -20,8 +25,8 @@ class Company(models.Model):
         'is active', 
         default=True
         )
-    total_vendas  = models.PositiveIntegerField(
-        'total vendas', 
+    faturamento_total  = models.PositiveIntegerField(
+        'faturamento', 
         null=False,
         blank=True,
         default=0
@@ -29,7 +34,7 @@ class Company(models.Model):
 
 class Inventory(models.Model):
     empresa = models.ForeignKey(
-        Company, 
+        Empresa, 
         on_delete=models.CASCADE, 
         related_name='invetorys', 
         null=False,
@@ -48,13 +53,14 @@ class TypeProdutChoices(models.TextChoices):
     drug = 'rémedio'
 
 class Product(models.Model):
-    inventory = models.ForeignKey(
+    inventory = models.OneToOneField(
         Inventory, 
         on_delete=models.CASCADE, 
         related_name='products',
         null=False,
         blank=False
-        )
+        ) # Change to ONE TO ONE
+    
     name = models.CharField('name', max_length=200)
     description = models.TextField('description', max_length=500)
     price = models.FloatField(
@@ -63,12 +69,7 @@ class Product(models.Model):
         blank=False,
         default=1,
     )
-    saled = models.BooleanField(
-        'saled', 
-        default=False,
-        null=False, 
-        blank=True,
-        )
+
     tipo = models.CharField(
         max_length=10,
         choices=TypeProdutChoices.choices,
@@ -81,11 +82,16 @@ class Product(models.Model):
 
 class Sale(models.Model):
     empresa = models.ForeignKey(
-        Company, 
+        Empresa, 
         on_delete=models.CASCADE, 
         related_name='sales'
         )
     boughtAt = models.DateTimeField('bought at', auto_now_add=True)
+
+class OrderSituation(models.TextChoices):
+    approved = 'aprovada'
+    rejected= 'rejeitada'
+    pending = 'pendente'
 
 class Order(models.Model):
     product = models.ForeignKey(
@@ -106,3 +112,28 @@ class Order(models.Model):
         blank=True,
         )
 
+    situation = models.CharField(
+        'situation',
+        max_length=15,
+        blank=True,
+        null=False,
+        choices=OrderSituation.choices,
+        default=OrderSituation.pending
+    )
+
+
+@receiver(pre_save, sender=Order)
+def registry_order(sender, instance, **kwargs):
+    inventory = instance.product.inventory
+    
+    if inventory.quantity >= instance.quantity:
+        empresa = inventory.empresa
+        inventory.quantity -= instance.quantity # Diminuir o estoque
+        empresa.faturamento_total += instance.product.price * instance.quantity # Aumentar faturamento da empresa
+        empresa.save()
+        inventory.save()
+        instance.situation = OrderSituation.approved
+        return 
+
+    instance.situation = OrderSituation.rejected
+    return

@@ -10,9 +10,15 @@ from django.core.exceptions import ValidationError
 class Empresa(models.Model):
     name = models.CharField(
         'name', 
-        max_length=200
+        max_length=200,
+        unique=True,
         )
-    email = models.EmailField('email')
+    email = models.EmailField(
+        'email', 
+        unique=True, 
+        null=False,
+        blank=False
+        )
     owner = models.ForeignKey(
         User, 
         related_name='empresa',
@@ -31,21 +37,8 @@ class Empresa(models.Model):
         default=0
         )
 
-
-class Inventory(models.Model): #ProductManager
-    empresa = models.ForeignKey(
-        Empresa, 
-        on_delete=models.CASCADE, 
-        related_name='invetorys', 
-        null=False,
-        blank=False,
-        )
-    quantity = models.PositiveIntegerField(
-        'quantity', 
-        null=False,
-        blank=False,
-        )
-
+    def __str__(self):
+        return self.name
 
 class TypeProdutChoices(models.TextChoices):
     generico = 'genérico'
@@ -53,14 +46,6 @@ class TypeProdutChoices(models.TextChoices):
     food = 'comida'
     drug = 'rémedio'
 class Product(models.Model):
-    inventory = models.OneToOneField(
-        Inventory, 
-        on_delete=models.CASCADE, 
-        related_name='products',
-        null=False,
-        blank=False
-        )
-
     name = models.CharField('name', max_length=200)
     description = models.TextField('description', max_length=500)
     price = models.FloatField(
@@ -81,6 +66,33 @@ class Product(models.Model):
         null=False, 
         blank=False)
 
+    def __str__(self):
+        return self.name
+
+
+class Inventory(models.Model): #ProductManager
+    product = models.OneToOneField(
+        Product, 
+        on_delete=models.CASCADE, 
+        related_name='inventory',
+        null=False,
+        blank=False
+        )
+
+    empresa = models.ForeignKey(
+        Empresa, 
+        on_delete=models.CASCADE, 
+        related_name='inventory', 
+        null=False,
+        blank=False,
+        )
+
+    quantity = models.PositiveIntegerField(
+        'quantity', 
+        null=False,
+        blank=False,
+        )
+
 
 class Sale(models.Model):
     empresa = models.ForeignKey(
@@ -89,7 +101,6 @@ class Sale(models.Model):
         related_name='sales'
         )
     boughtAt = models.DateTimeField('bought at', auto_now_add=True)
-
 
 class OrderSituation(models.TextChoices):
     approved = 'aprovada'

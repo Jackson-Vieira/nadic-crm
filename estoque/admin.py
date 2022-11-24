@@ -26,4 +26,4 @@ class ProductModelAdmin(admin.ModelAdmin):
 
 @admin.register(Inventory)
 class ProductModelAdmin(admin.ModelAdmin):
-    inlines = [ProductInline]
+    pass

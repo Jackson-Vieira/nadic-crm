@@ -1,0 +1,5 @@
+<form action="{% url 'estoque:new_estoque' %}">
+    {% csrf_token %}
+    {{form.as_p}}
+    <button type='submit' >criar</button>
+</form>

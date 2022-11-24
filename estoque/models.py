@@ -5,7 +5,6 @@ from django.core.validators import MinValueValidator
 from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_save, pre_init, post_init
 
-
 from django.core.exceptions import ValidationError
 
 class Empresa(models.Model):
@@ -32,7 +31,8 @@ class Empresa(models.Model):
         default=0
         )
 
-class Inventory(models.Model):
+
+class Inventory(models.Model): #ProductManager
     empresa = models.ForeignKey(
         Empresa, 
         on_delete=models.CASCADE, 
@@ -46,12 +46,12 @@ class Inventory(models.Model):
         blank=False,
         )
 
+
 class TypeProdutChoices(models.TextChoices):
     generico = 'genérico'
     clothing = 'roupas'
     food = 'comida'
     drug = 'rémedio'
-
 class Product(models.Model):
     inventory = models.OneToOneField(
         Inventory, 
@@ -59,8 +59,8 @@ class Product(models.Model):
         related_name='products',
         null=False,
         blank=False
-        ) # Change to ONE TO ONE
-    
+        )
+
     name = models.CharField('name', max_length=200)
     description = models.TextField('description', max_length=500)
     price = models.FloatField(
@@ -74,11 +74,13 @@ class Product(models.Model):
         max_length=10,
         choices=TypeProdutChoices.choices,
         null=True,
+        blank=True
     )
     fabricatedAt = models.DateField(
         'fabricated at', 
         null=False, 
         blank=False)
+
 
 class Sale(models.Model):
     empresa = models.ForeignKey(
@@ -88,11 +90,11 @@ class Sale(models.Model):
         )
     boughtAt = models.DateTimeField('bought at', auto_now_add=True)
 
+
 class OrderSituation(models.TextChoices):
     approved = 'aprovada'
-    rejected= 'rejeitada'
+    rejected = 'rejeitada'
     pending = 'pendente'
-
 class Order(models.Model):
     product = models.ForeignKey(
         Product, 

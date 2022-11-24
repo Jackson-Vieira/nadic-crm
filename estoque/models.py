@@ -4,12 +4,11 @@ from django.core.validators import MinValueValidator
 
 from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_save, pre_init, post_init
-
 from django.core.exceptions import ValidationError
 
 class Empresa(models.Model):
     name = models.CharField(
-        'name', 
+        'nome', 
         max_length=200,
         unique=True,
         )
@@ -21,6 +20,7 @@ class Empresa(models.Model):
         )
     owner = models.ForeignKey(
         User, 
+        verbose_name='dono',
         related_name='empresa',
         on_delete=models.SET_NULL,
         null=True,
@@ -31,7 +31,7 @@ class Empresa(models.Model):
         default=True
         )
     faturamento_total  = models.PositiveIntegerField(
-        'faturamento', 
+        'faturamento total', 
         null=False,
         blank=True,
         default=0
@@ -106,6 +106,7 @@ class OrderSituation(models.TextChoices):
     approved = 'aprovada'
     rejected = 'rejeitada'
     pending = 'pendente'
+
 class Order(models.Model):
     product = models.ForeignKey(
         Product, 

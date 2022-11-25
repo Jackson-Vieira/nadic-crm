@@ -1,0 +1,14 @@
+<form action="{% url 'estoque:new_registro' %}" method="post">
+    {% csrf_token %}
+    {{form.as_p}}
+    <p>
+        <label for="product">Produto:</label>
+        <select id="product" name="product">
+    {% for inventory in inventorys %}
+        <option  value={{inventory.product.id}} >{{inventory.product}}</option>
+    {% endfor %}
+    </select>
+    </p>
+    
+    <button type='submit' >criar</button>
+</form>

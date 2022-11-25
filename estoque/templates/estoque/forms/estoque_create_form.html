@@ -1,4 +1,4 @@
-<form action="{% url 'estoque:new_estoque' %}">
+<form action="{% url 'estoque:new_estoque' %}" method="post">
     {% csrf_token %}
     {{form.as_p}}
     <button type='submit' >criar</button>

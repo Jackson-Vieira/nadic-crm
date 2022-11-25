@@ -1,0 +1,34 @@
+{% extends 'estoque/base.html' %}
+
+{% block title %}{% endblock title %}
+{% block content %}
+<p>
+    <a href="{% url 'estoque:new_registro'%}"><button>Criar Registro</button></a>
+</p>
+<div style="overflow-x: auto;">
+    <table>
+        <thead>
+            <tr>
+                <td>ID</td>
+                <td>Produto</td>
+                <td>Quantidade</td>
+                <td>Data</td>
+                <td>Preço Total</td>
+                <td>Situacao</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>{{order.id}}</td>
+                <td>{{order.product}}</td>
+                <td>{{order.quantity}} </td>
+                <td>{{order.createdAt}}</td>
+                <td>{{order.total_price}}</td>
+                <td>{{order.situation}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}

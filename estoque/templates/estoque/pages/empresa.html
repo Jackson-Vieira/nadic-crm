@@ -1,12 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <p>{{empresa}}</p>
-</body>
-</html>
+{% extends 'estoque/base.html' %}
+
+{% block title %}
+<h2>Empresa - Informações</h2>
+{% endblock title %}
+{% block content %}
+<p>Nome: {{empresa.name}} </p>
+<p>Email: {{empresa.email}}</p>
+<p>Dono: {{empresa.owner}} </p>
+<p>Faturamento Total: {{empresa.faturamento_total}}</p>
+{% endblock content %}

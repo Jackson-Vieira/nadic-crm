@@ -1,0 +1,42 @@
+table, th, td {
+    border: 1px solid #333;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 15px;
+}
+
+table {
+    width: 80%;
+}
+
+th  {
+    height: 40px;
+}
+
+table {
+    width: 50%;
+    table-layout: fixed;
+}
+
+th {
+    text-align: left;
+    height: 40px;
+    vertical-align: bottom;
+}
+
+caption {
+    caption-side: bottom;
+}
+
+table {
+    empty-cells: hide;
+}
+
+thead td {
+    font-weight: bold;
+}

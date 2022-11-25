@@ -1,0 +1,6 @@
+<p>Você tem certeza que quer excluir este estoque?</p>
+<form action="{% url 'estoque:delete_estoque' estoque.id %}" method="post">
+    {% csrf_token %}
+    <button type='submit'>confirmar</button>
+    <a href="{% url 'estoque:estoques' %}"><button type="button">cancelar</button></a>
+</form>

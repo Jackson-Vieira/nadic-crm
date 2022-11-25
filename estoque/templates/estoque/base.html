@@ -1,12 +1,49 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Django App</title>
+    <title>Controll</title>
+
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
 </head>
 <body>
-    
+    <header>
+        <div class="empresa-info">
+            <h1 id="title" >Logo</h1>
+            <ul>   
+                <a href="#"><li>Início</li></a>
+                <a href="#"><li>Sobre</li></a>
+                <a href="#"><li>Contato</li></a>
+           </ul>
+        </div>
+        <ul>   
+            {% if user.empresa %}
+            <a href="{% url 'estoque:empresa' %}"><li> Minha Empresa</li></a>
+            <a href="#"><li> # {{user.username}}</li></a>
+            <a href="{% url 'authentication:logout' %}"><li> Logout </li></a>
+            {% endif %}
+        </ul>
+    </header>
+    <nav>
+        <ul>
+            <a href="{% url 'estoque:empresa' %}"><li>Empresa</li></a>
+            <a href="{%  url 'estoque:estoques' %}"><li>Inventário</li></a>
+            <a href="{%  url 'estoque:registros' %}"><li>Registros</li></a>
+        </ul>
+    </nav>
+    <main>
+        <div>
+            {% block title %}{% endblock title %}
+        </div>
+           
+        <div>
+            {% block content %}{% endblock content %}
+        </div>
+    </main>
+    <footer>made by @jaquiso_</footer>
 </body>
 </html>

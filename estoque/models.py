@@ -6,6 +6,11 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_save, pre_init, post_init
 from django.core.exceptions import ValidationError
 
+
+
+class TypeEmpresaChoices(models.TextChoices):
+    market = 'market'
+    other = 'other'
 class Empresa(models.Model):
     name = models.CharField(
         'nome', 
@@ -17,6 +22,12 @@ class Empresa(models.Model):
         unique=True, 
         null=False,
         blank=False
+        )
+
+    type = models.CharField(
+        max_length=20 ,
+        choices=TypeEmpresaChoices.choices,
+        default=TypeEmpresaChoices.market,
         )
     owner = models.ForeignKey(
         User, 
@@ -94,13 +105,13 @@ class Inventory(models.Model): #ProductManager
         )
 
 
-class Sale(models.Model):
-    empresa = models.ForeignKey(
-        Empresa, 
-        on_delete=models.CASCADE, 
-        related_name='sales'
-        )
-    boughtAt = models.DateTimeField('bought at', auto_now_add=True)
+# class Sale(models.Model):
+#     empresa = models.ForeignKey(
+#         Empresa, 
+#         on_delete=models.CASCADE, 
+#         related_name='sales'
+#         )
+#     boughtAt = models.DateTimeField('bought at', auto_now_add=True)
 
 class OrderSituation(models.TextChoices):
     approved = 'aprovada'
@@ -108,23 +119,40 @@ class OrderSituation(models.TextChoices):
     pending = 'pendente'
 
 class Order(models.Model):
+    empresa = models.ForeignKey(
+         Empresa, 
+         on_delete=models.CASCADE, 
+         related_name='orders'
+         )
     product = models.ForeignKey(
         Product, 
         on_delete=models.CASCADE,
         null=None,
         blank=None,
         )
+
+    
     quantity = models.IntegerField(
-        validators=[MinValueValidator(1)]
+        validators=[MinValueValidator(1)],
+        default=1,
         )
+    
     createdAt = models.DateTimeField('created at', auto_now_add=True)
-    registry = models.ForeignKey(
-        Sale, 
-        on_delete=models.CASCADE, 
-        related_name='orders',
-        null=True,
-        blank=True,
-        )
+    price_product = models.FloatField(
+        default=0,
+        null=False
+    )
+
+    def total_price(self):
+        return self.price_product * self.quantity
+    
+    # registry = models.ForeignKey(
+    #     Sale, 
+    #     on_delete=models.CASCADE, 
+    #     related_name='orders',
+    #     null=True,
+    #     blank=True,
+    #     )
 
     situation = models.CharField(
         'situation',
@@ -144,6 +172,7 @@ def registry_order(sender, instance, **kwargs):
         empresa = inventory.empresa
         inventory.quantity -= instance.quantity # Diminuir o estoque
         empresa.faturamento_total += instance.product.price * instance.quantity # Aumentar faturamento da empresa
+        instance.price_product = instance.product.price
         empresa.save()
         inventory.save()
         instance.situation = OrderSituation.approved

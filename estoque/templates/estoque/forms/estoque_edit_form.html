@@ -1,0 +1,5 @@
+<form action="{% url 'estoque:edit_estoque' estoque.id %}" method="post">
+    {% csrf_token %}
+    {{form.as_p}}
+    <button type='submit'>salvar</button>
+</form>

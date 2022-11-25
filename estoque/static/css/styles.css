@@ -7,7 +7,6 @@ body {
     padding: 15px;
 }
 
-
 h1 {
     font-weight: 200;
 }
@@ -16,6 +15,12 @@ header {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    align-items: center;
+}
+
+.empresa-info {
+    display: flex;
+    flex-direction: row;
     align-items: center;
 }
 
@@ -48,6 +53,7 @@ header li {
 }
 
 main {
+    
     display: flex;
     flex-direction: row;
     margin-top: 2rem;

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.admin.options import TabularInline
 
-from .models import Empresa, Product, Order, Inventory, Sale
+from .models import Empresa, Product, Order, Inventory
 
 class OrderInline(TabularInline):
     extra = 1
@@ -14,12 +14,12 @@ class EmpresaModelAdmin(admin.ModelAdmin):
     readonly_fields = ['faturamento_total']
     search_fields = ['name', 'owner']
 
-@admin.register(Sale)
-class SaleModelAdmin(admin.ModelAdmin):
-    inlines = (OrderInline, )
-    list_display = ['id', 'empresa']
-    search_fields = ['empresa', ]
-    list_filter = ['boughtAt',]
+# @admin.register(Sale)
+# class SaleModelAdmin(admin.ModelAdmin):
+#     inlines = (OrderInline, )
+#     list_display = ['id', 'empresa']
+#     search_fields = ['empresa', ]
+#     list_filter = ['boughtAt',]
 
 @admin.register(Product)
 class ProductModelAdmin(admin.ModelAdmin):
@@ -32,3 +32,8 @@ class ProductModelAdmin(admin.ModelAdmin):
 class ProductManagerModelAdmin(admin.ModelAdmin):
     list_display = ['id', 'product', 'empresa', 'quantity']
     list_filter = ['empresa',]
+
+@admin.register(Order)
+class OrderModelAdmin(admin.ModelAdmin):
+    list_filter = ['empresa']
+    readonly_fields = ['situation', 'price_product']

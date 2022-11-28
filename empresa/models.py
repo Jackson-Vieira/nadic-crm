@@ -5,7 +5,7 @@ from django.core.validators import MinValueValidator
 class Company(models.Model):
     owner = models.OneToOneField(
         User, 
-        related_name='empresa',
+        related_name='company',
         on_delete=models.DO_NOTHING,
         null=False,
         blank=False,

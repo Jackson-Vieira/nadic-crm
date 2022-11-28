@@ -6,11 +6,10 @@ from ..models import Company, Product, Registry, Inventory
 
 class CompanySerializer(serializers.ModelSerializer):
     # onwer = UserSerializer()
-
     class Meta:
         model =  Company
-        fields = ('id', 'owner', 'name', 'email')
-        read_only_fields = ['total_billing']
+        fields = ('owner','name', 'email', 'total_billing')
+        # pedente extra kwargs (required, readonly fields, ...)
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:

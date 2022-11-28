@@ -2,12 +2,6 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.core.validators import MinValueValidator
 
-from django.dispatch import receiver
-from django.db.models.signals import post_save, pre_save, pre_init, post_init
-
-
-from django.core.exceptions import ValidationError
-
 class Company(models.Model):
     owner = models.OneToOneField(
         User, 
@@ -32,7 +26,10 @@ class TypeProdutChoices(models.TextChoices):
     OTHER = 'other'
 class Product(models.Model):
     company = models.ForeignKey(
-        
+        Company,
+        on_delete=models.CASCADE,
+        null=False,
+        blank=False,
     )
     name = models.CharField('name', max_length=200)
     description = models.TextField('description', max_length=200)
@@ -65,6 +62,12 @@ class RegistrySituation(models.TextChoices):
     REJECTED = 'rejjected'
     PENDING = 'pending'
 class Registry(models.Model):
+    company = models.ForeignKey(
+        Company, 
+        on_delete=models.CASCADE,
+        null=False,
+        blank=False,
+        )
     product = models.ForeignKey(
         Product, 
         on_delete=models.DO_NOTHING,
@@ -83,7 +86,7 @@ class Registry(models.Model):
         blank=True,
         null=False,
         choices=RegistrySituation.choices,
-        default=RegistrySituation.pending
+        default=RegistrySituation.PENDING
     )
 
 

@@ -10,3 +10,6 @@
 #     print(created)
 #     print(kwargs)
 #     return
+
+
+# Produto criado -> inicializar estoque 

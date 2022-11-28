@@ -53,8 +53,8 @@ class Inventory(models.Model):
     )
     quantity = models.PositiveIntegerField(
         'quantity', 
-        null=False,
-        blank=False,
+        blank=True,
+        default=0
         )
 
 class RegistrySituation(models.TextChoices):
@@ -74,7 +74,11 @@ class Registry(models.Model):
         null=False,
         blank=False,
         )
-    product_price = None
+    product_price = models.FloatField(
+        validators=[MinValueValidator(0.1)], # Implement GreaterThanZeroValueValidator
+        null=False,
+        blank=False,
+    )
     product_quantity = models.IntegerField(
         validators=[MinValueValidator(1)]
         )
@@ -89,6 +93,8 @@ class Registry(models.Model):
         default=RegistrySituation.PENDING
     )
 
+    def total_price(self):
+        return self.product_price * self.product_quantity
 
 # @receiver(pre_save, sender=Order)
 # def registry_order(sender, instance, **kwargs):

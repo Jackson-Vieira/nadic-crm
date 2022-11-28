@@ -7,7 +7,6 @@ from django.db.models.signals import post_save, pre_save, pre_init, post_init
 from django.core.exceptions import ValidationError
 
 
-
 class TypeEmpresaChoices(models.TextChoices):
     market = 'market'
     other = 'other'
@@ -143,6 +142,15 @@ class Order(models.Model):
         null=False
     )
 
+    situation = models.CharField(
+        'situation',
+        max_length=15,
+        blank=True,
+        null=False,
+        choices=OrderSituation.choices,
+        default=OrderSituation.pending
+    )
+
     def total_price(self):
         return self.price_product * self.quantity
     
@@ -154,20 +162,14 @@ class Order(models.Model):
     #     blank=True,
     #     )
 
-    situation = models.CharField(
-        'situation',
-        max_length=15,
-        blank=True,
-        null=False,
-        choices=OrderSituation.choices,
-        default=OrderSituation.pending
-    )
+    
 
 
 @receiver(pre_save, sender=Order)
 def registry_order(sender, instance, **kwargs):
     inventory = instance.product.inventory
     
+    # validação
     if inventory.quantity >= instance.quantity:
         empresa = inventory.empresa
         inventory.quantity -= instance.quantity # Diminuir o estoque

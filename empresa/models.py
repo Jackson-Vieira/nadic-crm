@@ -31,12 +31,13 @@ class Product(models.Model):
         null=False,
         blank=False,
     )
-    name = models.CharField('name', max_length=200)
+    name = models.CharField('name', max_length=200, unique=True)
     description = models.TextField('description', max_length=200)
     price = models.FloatField(
         validators=[MinValueValidator(0.1)], # Implement GreaterThanZeroValueValidator
         null=False,
         blank=False,
+        default=1,
     )
     product_type = models.CharField(
         max_length=10,

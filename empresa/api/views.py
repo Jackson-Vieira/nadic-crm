@@ -33,16 +33,14 @@ def get_current_user_company_stats(request):
 @api_view(['GET'])
 def get_current_user_company_products(request):
     user = request.user
-    # user company without products
-    products = user.company.products
+    products = Product.objects.filter(company=user.company)
     serializer = ProductSerializer(products, many=True)
     return Response(serializer.data)
 
 @api_view(['GET'])
 def get_current_user_company_registrys(request):
     user = request.user
-    # user company without registrys
-    registrys = user.company.registrys
+    registrys = Registry.objects.filter(company=user.company)
     serializer = RegistrySerializer(registrys, many=True)
     return Response(serializer.data)
 
@@ -52,7 +50,6 @@ def new_product(request):
     company = Company.objects.get(owner=request.user)
     data = request.data
     data['company'] = company
-    # not permmited  products with the same name
     serializer = ProductSerializer(data=data)
     if serializer.is_valid(raise_exception=True):
         serializer.save()
@@ -61,26 +58,29 @@ def new_product(request):
 @api_view(['GET'])
 # autenticação, permissão
 def get_product_detail(request, product_id):
-    product =  get_object_or_404(Product, product_id)
+    user = request.user
+    company_products = Product.objects.filter(company=user.company)
+    product =  get_object_or_404(company_products, pk=product_id)
     serializer = ProductSerializer(product, many=False)
     return Response(serializer.data)
     
-@api_view(['PUT'])
+@api_view(['POST'])
 # autenticação, permissão
 def edit_product(request, product_id):
-    product =  get_object_or_404(Product, product_id)
+    user = request.user
+    company_products = Product.objects.filter(company=user.company)
+    product =  get_object_or_404(company_products, pk=product_id)
     data = request.data
     serializer = ProductSerializer(instance=product, data=data, many=False)
-
     if serializer.is_valid(raise_exception=True):
         serializer.save()
         return Response(serializer.data)
     # return Response(serializer.errors)
 
-@api_view(['DELETE'])
+@api_view(['GET'])
 # autenticação, permissão
 def delete_product(request, product_id):
-    product =  get_object_or_404(Product, product_id)
+    product =  get_object_or_404(Product, pk=product_id)
     product.delete()
 
     response = {
@@ -89,26 +89,24 @@ def delete_product(request, product_id):
 
     return Response(response, status=status.HTTP_200_OK)
 
-# INVENTORY VIEWS
-@api_view(['POST'])
-def new_inventory(request):
-    # validação 
-    # apenas permitir criação de produtos disponíveis da empresa
-    serializer = InventorySerializer(data=request.data)
-    print(serializer.product)
-
 @api_view(['GET'])
 # autenticação, permissão
-def get_inventory_detail(request, inventory_id):
-    product =  get_object_or_404(Inventory, inventory_id)
-    serializer = ProductSerializer(product, many=False)
+def get_inventory_detail(request, product_id):
+    user = request.user
+    company_products = Product.objects.filter(company=user.company)
+    product =  get_object_or_404(company_products, pk=product_id)
+    inventory = Inventory.objects.get(product=product)
+    serializer = ProductSerializer(inventory, many=False)
     return Response(serializer.data)
 
 @api_view(['PUT'])
-def edit_inventory(request, inventory_id):
-    product =  get_object_or_404(Inventory, inventory_id)
+def edit_inventory(request, product_id):
+    user = request.user
+    company_products = Product.objects.filter(company=user.company)
+    product =  get_object_or_404(company_products, pk=product_id)
+    inventory = Inventory.objects.get(product=product)
     data = request.data
-    serializer = InventorySerializer(instance=product, data=data, many=False)
+    serializer = InventorySerializer(instance=inventory, data=data, many=False)
     if serializer.is_valid(raise_exception=True):
         serializer.save()
         return Response(serializer.data)
@@ -130,6 +128,6 @@ def new_registry(request):
 
 @api_view(['GET'])
 def get_registry_detail(request, registry_id):
-    registry =  get_object_or_404(Registry, registry_id)
+    registry =  get_object_or_404(Registry, pk=registry_id)
     serializer = ProductSerializer(registry, many=False)
     return Response(serializer.data)

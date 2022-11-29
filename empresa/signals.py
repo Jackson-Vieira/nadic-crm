@@ -12,4 +12,4 @@
 #     return
 
 
-# Produto criado -> inicializar estoque 
+# Produto criado -> inicializar estoque -> quantity = 0

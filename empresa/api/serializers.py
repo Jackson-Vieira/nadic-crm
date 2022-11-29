@@ -15,7 +15,7 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ('company', 'name', 'description', 'price', 'product_type')
-
+        
 class InventorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Inventory
@@ -24,5 +24,5 @@ class InventorySerializer(serializers.ModelSerializer):
 class RegistrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Registry
-        fields = ('product', 'product_quantity', 'product_price','create_at',  'situation')
-        read_only_fields = ('total_price')
+        fields = ('product', 'product_quantity')
+        #read_only_fields = ('total_price', 'create_at', 'situation', 'product_price')

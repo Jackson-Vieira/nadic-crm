@@ -5,29 +5,10 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 
+from django.shortcuts import get_object_or_404
+
 from ..models import Company, Product, Inventory, Registry
 from .serializers import CompanySerializer, ProductSerializer, InventorySerializer, RegistrySerializer
-
-# class CompanyViewSet(ModelViewSet):
-#     model = Company
-#     queryset = Company.objects.all()
-#     serializer_class = CompanySerializer
-
-# class ProductViewSet(ModelViewSet):
-#     model = Product
-#     queryset = Product.objects.all()
-#     serializer_class = ProductSerializer
-
-# class InventoryViewSet(ModelViewSet):
-#     model = Inventory
-#     queryset = Inventory.objects.all()
-#     serializer_class = InventorySerializer 
-
-# class RegistryViewSet(ModelViewSet):
-#     model = Registry
-#     queryset = Registry.objects.all()
-#     serializer_class = RegistrySerializer 
-
 
 # COMPANY VIEWS
 @api_view(['POST'])
@@ -39,20 +20,17 @@ def new_company(request):
     if serializer.is_valid(raise_exception=True):
         serializer.save()
         return Response(serializer.data)
-    
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_current_user_company_stats(request):
     user = request.user
-
     # user without a company validation
     company = user.company
     serializer = CompanySerializer(user.company)
     return Response(serializer.data)
 
-
-api_view(['GET'])
+@api_view(['GET'])
 def get_current_user_company_products(request):
     user = request.user
     # user company without products
@@ -60,8 +38,7 @@ def get_current_user_company_products(request):
     serializer = ProductSerializer(products, many=True)
     return Response(serializer.data)
 
-
-api_view(['GET'])
+@api_view(['GET'])
 def get_current_user_company_registrys(request):
     user = request.user
     # user company without registrys
@@ -69,38 +46,90 @@ def get_current_user_company_registrys(request):
     serializer = RegistrySerializer(registrys, many=True)
     return Response(serializer.data)
 
-
 # PRODUCTS VIEWS
 @api_view(['POST'])
 def new_product(request):
-    pass
+    company = Company.objects.get(owner=request.user)
+    data = request.data
+    data['company'] = company
+    # not permmited  products with the same name
+    serializer = ProductSerializer(data=data)
+    if serializer.is_valid(raise_exception=True):
+        serializer.save()
+        return Response(serializer.data)
 
-api_view(['GET'])
+@api_view(['GET'])
+# autenticação, permissão
 def get_product_detail(request, product_id):
-    pass
+    product =  get_object_or_404(Product, product_id)
+    serializer = ProductSerializer(product, many=False)
+    return Response(serializer.data)
+    
+@api_view(['PUT'])
+# autenticação, permissão
+def edit_product(request, product_id):
+    product =  get_object_or_404(Product, product_id)
+    data = request.data
+    serializer = ProductSerializer(instance=product, data=data, many=False)
 
-api_view(['PUT'])
-def edit_product(request, registry_id):
-    pass
+    if serializer.is_valid(raise_exception=True):
+        serializer.save()
+        return Response(serializer.data)
+    # return Response(serializer.errors)
 
-api_view(['DELETE'])
+@api_view(['DELETE'])
+# autenticação, permissão
 def delete_product(request, product_id):
-    pass
+    product =  get_object_or_404(Product, product_id)
+    product.delete()
+
+    response = {
+        'message': 'product has been permanently deleted'
+    }
+
+    return Response(response, status=status.HTTP_200_OK)
 
 # INVENTORY VIEWS
-api_view(['POST'])
+@api_view(['POST'])
 def new_inventory(request):
-    pass
+    # validação 
+    # apenas permitir criação de produtos disponíveis da empresa
+    serializer = InventorySerializer(data=request.data)
+    print(serializer.product)
 
-api_view(['PUT'])
-def edit_inventory(request):
-    pass
+@api_view(['GET'])
+# autenticação, permissão
+def get_inventory_detail(request, inventory_id):
+    product =  get_object_or_404(Inventory, inventory_id)
+    serializer = ProductSerializer(product, many=False)
+    return Response(serializer.data)
+
+@api_view(['PUT'])
+def edit_inventory(request, inventory_id):
+    product =  get_object_or_404(Inventory, inventory_id)
+    data = request.data
+    serializer = InventorySerializer(instance=product, data=data, many=False)
+    if serializer.is_valid(raise_exception=True):
+        serializer.save()
+        return Response(serializer.data)
 
 #  REGISTRYS VIEWS
-api_view(['POST'])
+@api_view(['POST'])
 def new_registry(request):
-    pass
+    # validação 
+    # permitir registros de produtos disponíveis da empresa
+    # definir a situação do registro depedendo da quantidade solicitada
+    company = Company.objects.get(owner=request.user)
+    data = request.data
+    data['company'] = company.pk
+    serializer = RegistrySerializer(request.data)
 
-api_view(['GET'])
+    if serializer.is_valid(raise_exception=True):
+        serializer.save()
+        return Response(serializer.data)
+
+@api_view(['GET'])
 def get_registry_detail(request, registry_id):
-    pass
+    registry =  get_object_or_404(Registry, registry_id)
+    serializer = ProductSerializer(registry, many=False)
+    return Response(serializer.data)

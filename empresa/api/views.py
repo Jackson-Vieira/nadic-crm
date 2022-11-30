@@ -7,7 +7,7 @@ from rest_framework.decorators import api_view, permission_classes
 
 from django.shortcuts import get_object_or_404
 
-from ..models import Company, Product, Inventory, Registry
+from ..models import Company, Product, Inventory, Registry, RegistrySituation
 from .serializers import CompanySerializer, ProductSerializer, InventorySerializer, RegistrySerializer
 from .utils.validators import user_has_company
 from .permissions import HasCompany
@@ -57,6 +57,7 @@ def new_product(request):
     if serializer.is_valid(raise_exception=True):
         product = serializer.save(company=request.user.company)
         Inventory.objects.create(product=product)
+        print("opa")
         return Response(serializer.data)
 
 @api_view(['GET'])
@@ -64,7 +65,6 @@ def new_product(request):
 def get_product_detail(request, product_id):
     user = request.user
     product =  get_object_or_404(Product, pk=product_id)
-
     if product.company == user.company:
         serializer = ProductSerializer(product, many=False)
         return Response(serializer.data)
@@ -132,9 +132,13 @@ def edit_inventory(request, product_id):
 @permission_classes([IsAuthenticated, HasCompany])
 def new_registry(request):
     user = request.user
-    serializer = RegistrySerializer(request.data)
+    data = request.data
+    serializer = RegistrySerializer(data=data)
     if serializer.is_valid(raise_exception=True):
-        serializer.save(company=user.company)
+        # verificar se o produto pertence a empresa ?
+        product = Product.objects.get(pk=data.get('product'))
+        registry = serializer.save(company=user.company, product_price=product.price)
+
         return Response(serializer.data)
 
 @api_view(['GET'])

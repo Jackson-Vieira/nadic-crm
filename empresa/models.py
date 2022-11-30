@@ -19,6 +19,10 @@ class Company(models.Model):
     email = models.EmailField('email', null=True, blank=True)
     total_billing  = models.FloatField(default=0)
 
+
+    def __str__(self):
+        return str(self.id)
+
 class TypeProdutChoices(models.TextChoices):
     GENERIC = 'generic'
     FOOD = 'food'
@@ -45,6 +49,9 @@ class Product(models.Model):
         null=False,
         blank=False,
     )
+
+    def __str__(self):
+        return self.name
 
 class Inventory(models.Model):
     product = models.OneToOneField(

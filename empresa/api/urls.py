@@ -8,7 +8,7 @@ urlpatterns = []
 urls_v1 = [
     path('companys/', views.new_company, name='new_company' ),
     
-    path('me/company/', views.get_current_user_company_stats, name='current_user_company'),
+    path('me/company/stats/', views.get_current_user_company_stats, name='current_user_company'),
 
     path('me/company/products/', views.get_current_user_company_products, name='current_user_company_products'),
     path('me/company/products/new/', views.new_product, name='current_user_company_new_product'),

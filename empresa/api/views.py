@@ -14,11 +14,12 @@ from .serializers import CompanySerializer, ProductSerializer, InventorySerializ
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def new_company(request):
+    # Verificar se o usuario já tem uma empresa
     data = request.data
-    data['owner'] = request.user.id
-    serializer = CompanySerializer(data=request.data)
+    serializer = CompanySerializer(data=data)
+
     if serializer.is_valid(raise_exception=True):
-        serializer.save()
+        serializer.save(owner=request.user)
         return Response(serializer.data)
 
 @api_view(['GET'])
@@ -49,10 +50,11 @@ def get_current_user_company_registrys(request):
 def new_product(request):
     company = Company.objects.get(owner=request.user)
     data = request.data
-    data['company'] = company
+    data['company'] = company.id
     serializer = ProductSerializer(data=data)
     if serializer.is_valid(raise_exception=True):
-        serializer.save()
+        product = serializer.save()
+        Inventory.objects.create(product=product)
         return Response(serializer.data)
 
 @api_view(['GET'])
@@ -96,7 +98,7 @@ def get_inventory_detail(request, product_id):
     company_products = Product.objects.filter(company=user.company)
     product =  get_object_or_404(company_products, pk=product_id)
     inventory = Inventory.objects.get(product=product)
-    serializer = ProductSerializer(inventory, many=False)
+    serializer = InventorySerializer(inventory, many=False)
     return Response(serializer.data)
 
 @api_view(['PUT'])

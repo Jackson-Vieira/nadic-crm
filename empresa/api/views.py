@@ -135,7 +135,6 @@ def new_registry(request):
     data = request.data
     serializer = RegistrySerializer(data=data)
     if serializer.is_valid(raise_exception=True):
-        # verificar se o produto pertence a empresa ?
         product = Product.objects.get(pk=data.get('product'))
         registry = serializer.save(company=user.company, product_price=product.price)
 

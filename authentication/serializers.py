@@ -9,8 +9,8 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('username', 'password', 'email', 'first_name', 'last_name')
 
         extra_kwargs = {
-            'username': {'required': True, 'allow_blank': False, 'min_length': 8},
-            'passoword': {'required': True, 'allow_blank': False, 'min_length': 4},
+            'username': {'required': False, 'allow_blank': True, 'min_length': 8},
+            'passoword': {'required': True, 'write_only':True, 'allow_blank': False, 'min_length': 4},
             'email': {'required': True},
         }
         unique_togueter = [('username', 'email'),]

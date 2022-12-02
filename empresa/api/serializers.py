@@ -1,7 +1,8 @@
-
 from rest_framework import serializers
 
 from ..models import Company, Product, Registry, Inventory
+
+from authentication.serializers import UserSerializer
 
 class CompanySerializer(serializers.ModelSerializer):
     # onwer = UserSerializer()
@@ -21,7 +22,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ('id','name', 'description', 'price', 'product_type', 'quantity_in_inventory')
+        fields = ('id', 'name', 'description', 'price', 'product_type', 'quantity_in_inventory')
         
 class RegistrySerializer(serializers.ModelSerializer):
     class Meta:

@@ -9,17 +9,21 @@ from .serializers import UserSerializer
 
 from django.shortcuts import render
 
+from django.contrib.auth.models import User
+
+
 @api_view(['POST'])
 def register_user(request):
     data = request.data
     serializer = UserSerializer(data=data)
-
-    if serializer.is_valid():
-        username= data.get('username')
-        password = data.get('password')
-        serializer.save(username=username, password=make_password(password))
-        return Response(serializer.data)
-    return Response(serializer.errors)
+    username= data.get('email')
+    if not User.objects.filter(username=username).exists():
+        if serializer.is_valid():
+            password = data.get('password')
+            serializer.save(username=username, password=make_password(password))
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    return Response({'message': 'A User with the this email already exists'}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

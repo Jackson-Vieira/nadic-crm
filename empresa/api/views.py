@@ -65,10 +65,9 @@ def get_current_user_company_registrys(request):
 def new_product(request):
     data = request.data
     serializer = ProductSerializer(data=data)
-    if serializer.is_valid(raise_exception=True):
-        product = serializer.save(company=request.user.company)
-        Inventory.objects.create(product=product)
-        return Response(serializer.data)
+    serializer.is_valid(raise_exception=True)
+    serializer.save(company=request.user.company)
+    return Response(serializer.data)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated, HasCompany])

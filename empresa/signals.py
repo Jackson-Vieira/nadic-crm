@@ -3,6 +3,12 @@ from django.db.models.signals import post_save
 
 from .models import Product, Registry, Inventory, Company, RegistrySituation
 
+
+@receiver(post_save, sender=Product)
+def create_product_inventory(sender, instance, created, **kwargs):
+    if created:
+        Inventory.objects.create(product=instance)
+
 @receiver(post_save, sender=Registry)
 def verify_registry(sender, instance, created, **kwargs):
     if created:

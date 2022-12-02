@@ -15,10 +15,11 @@ class Company(models.Model):
         max_length=200,
         null=False,
         blank=False,
+        unique=True,
+        primary_key=True,
         )
     email = models.EmailField('email', null=True, blank=True)
     total_billing  = models.FloatField(default=0)
-
 
     def __str__(self):
         return str(self.id)

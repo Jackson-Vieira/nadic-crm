@@ -5,11 +5,11 @@ from ..models import Company, Product, Registry, Inventory
 from authentication.serializers import UserSerializer
 
 class CompanySerializer(serializers.ModelSerializer):
+    
     # onwer = UserSerializer()
     class Meta:
         model =  Company
-        fields = ('name', 'email', 'total_billing')
-        read_only_fields = ('total_billing',)
+        fields = ('name', 'email')
     
 class InventorySerializer(serializers.ModelSerializer):
     class Meta:

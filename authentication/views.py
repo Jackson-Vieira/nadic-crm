@@ -4,13 +4,9 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
 from django.contrib.auth.hashers import make_password
-
-from .serializers import UserSerializer
-
-from django.shortcuts import render
-
 from django.contrib.auth.models import User
 
+from .serializers import UserSerializer
 
 @api_view(['POST'])
 def register_user(request):

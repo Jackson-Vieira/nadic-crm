@@ -23,7 +23,7 @@ def register_user(request):
             serializer.save(username=username, password=make_password(password))
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    return Response({'message': 'A User with the this email already exists'}, status=status.HTTP_400_BAD_REQUEST)
+    return Response({'message': 'A User with this email already exists'}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

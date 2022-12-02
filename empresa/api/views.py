@@ -27,9 +27,20 @@ def new_company(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated, HasCompany])
+def get_current_user_company(request):
+    user = request.user
+    serializer = CompanySerializer(user.company)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, HasCompany])
 def get_current_user_company_stats(request):
     user = request.user
     serializer = CompanySerializer(user.company)
+
+    # querys 
+    response = {}
+    
     return Response(serializer.data)
    
 @api_view(['GET'])
@@ -57,7 +68,6 @@ def new_product(request):
     if serializer.is_valid(raise_exception=True):
         product = serializer.save(company=request.user.company)
         Inventory.objects.create(product=product)
-        print("opa")
         return Response(serializer.data)
 
 @api_view(['GET'])
@@ -111,7 +121,7 @@ def get_inventory_detail(request, product_id):
         return Response(serializer.data)
     return Response({'message': 'you do not have permission access this resource'},status=status.HTTP_401_UNAUTHORIZED)
 
-@api_view(['PUT'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated, HasCompany])
 def edit_inventory(request, product_id):
     user = request.user
@@ -123,6 +133,9 @@ def edit_inventory(request, product_id):
         data = request.data
         serializer = InventorySerializer(instance=inventory, data=data, many=False)
         if serializer.is_valid(raise_exception=True):
+
+            # não permitir diminuir o estoque para valores negativos
+
             serializer.save()
             return Response(serializer.data)
         

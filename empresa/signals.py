@@ -3,10 +3,8 @@ from django.db.models.signals import post_save
 
 from .models import Product, Registry, Inventory, Company, RegistrySituation
 
-
 @receiver(post_save, sender=Registry)
 def verify_registry(sender, instance, created, **kwargs):
-    print('Registry signal')
     if created:
         # idea: celery task
         # pegar o produto
@@ -33,5 +31,3 @@ def verify_registry(sender, instance, created, **kwargs):
             # mudar a situação
             registry.situation = RegistrySituation.APPROVED
             registry.save()
-    
-# Produto criado -> inicializar estoque -> quantity = 0

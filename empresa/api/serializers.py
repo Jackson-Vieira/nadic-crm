@@ -8,24 +8,22 @@ class CompanySerializer(serializers.ModelSerializer):
     # onwer = UserSerializer()
     class Meta:
         model =  Company
-        fields = ('owner','name', 'email', 'total_billing')
-        read_only_fields = ('owner',) 
-        # pedente extra kwargs (required, readonly fields, ...)
-
+        fields = ('name', 'email', 'total_billing')
+        read_only_fields = ('total_billing',)
+    
 class InventorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Inventory
-        fields = ('product', 'quantity')
-
+        fields = ('quantity',)
+        
 class ProductSerializer(serializers.ModelSerializer):
-    quantity_in_inventory = serializers.IntegerField(source='inventory.quantity')
-
+    inventory = InventorySerializer(read_only=True)
     class Meta:
         model = Product
-        fields = ('id', 'name', 'description', 'price', 'product_type', 'quantity_in_inventory')
-        
+        fields = ('id', 'name', 'description', 'price', 'product_type', 'inventory')
+
 class RegistrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Registry
-        fields = ('product', 'product_quantity')
-        #read_only_fields = ('total_price', 'create_at', 'situation', 'product_price')
+        fields = ('product', 'product_quantity', 'total_price','situation', 'product_price', 'created_at')
+        read_only_fields = ('total_price','situation', 'product_price', 'create_at')

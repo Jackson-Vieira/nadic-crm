@@ -10,7 +10,7 @@ from django.shortcuts import get_object_or_404
 from ..models import Company, Product, Inventory, Registry, RegistrySituation
 from .serializers import CompanySerializer, ProductSerializer, InventorySerializer, RegistrySerializer
 from .utils.validators import user_has_company
-from .permissions import HasCompany
+from .permissions import HasCompanyOrReadOnly
 
 # COMPANY VIEWS
 @api_view(['POST'])
@@ -26,14 +26,14 @@ def new_company(request):
     return Response({'message': 'there is already a company linked to this user'})
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated, HasCompany])
+@permission_classes([IsAuthenticated, HasCompanyOrReadOnly])
 def get_current_user_company(request):
     user = request.user
     serializer = CompanySerializer(user.company)
     return Response(serializer.data)
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated, HasCompany])
+@permission_classes([IsAuthenticated, HasCompanyOrReadOnly])
 def get_current_user_company_stats(request):
     user = request.user
     serializer = CompanySerializer(user.company)
@@ -44,7 +44,7 @@ def get_current_user_company_stats(request):
     return Response(serializer.data)
    
 @api_view(['GET'])
-@permission_classes([IsAuthenticated, HasCompany])
+@permission_classes([IsAuthenticated, HasCompanyOrReadOnly])
 def get_current_user_company_products(request):
     user = request.user
     products = Product.objects.filter(company=user.company)
@@ -52,7 +52,7 @@ def get_current_user_company_products(request):
     return Response(serializer.data)
    
 @api_view(['GET'])
-@permission_classes([IsAuthenticated, HasCompany])
+@permission_classes([IsAuthenticated, HasCompanyOrReadOnly])
 def get_current_user_company_registrys(request):
     user = request.user
     registrys = Registry.objects.filter(company=user.company)
@@ -61,7 +61,7 @@ def get_current_user_company_registrys(request):
     
 # PRODUCTS VIEWS
 @api_view(['POST'])
-@permission_classes([IsAuthenticated, HasCompany])
+@permission_classes([IsAuthenticated, HasCompanyOrReadOnly])
 def new_product(request):
     data = request.data
     serializer = ProductSerializer(data=data)
@@ -70,7 +70,7 @@ def new_product(request):
     return Response(serializer.data)
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated, HasCompany])
+@permission_classes([IsAuthenticated, HasCompanyOrReadOnly])
 def get_product_detail(request, product_id):
     user = request.user
     product =  get_object_or_404(Product, pk=product_id)
@@ -80,7 +80,7 @@ def get_product_detail(request, product_id):
     return Response({'message': 'you do not have permission access for this resource'},status=status.HTTP_401_UNAUTHORIZED)
     
 @api_view(['POST'])
-@permission_classes([IsAuthenticated, HasCompany])
+@permission_classes([IsAuthenticated, HasCompanyOrReadOnly])
 def edit_product(request, product_id):
     user = request.user
     product =  get_object_or_404(Product, pk=product_id)
@@ -94,7 +94,7 @@ def edit_product(request, product_id):
     return Response({'message': 'you do not have permission to edit this resource'},status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated, HasCompany])
+@permission_classes([IsAuthenticated, HasCompanyOrReadOnly])
 def delete_product(request, product_id):
     user = request.user
 
@@ -109,7 +109,7 @@ def delete_product(request, product_id):
     return Response({'message': 'you do not have permission to delete this resource'}, status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated, HasCompany])
+@permission_classes([IsAuthenticated, HasCompanyOrReadOnly])
 def get_inventory_detail(request, product_id):
     user = request.user
     product =  get_object_or_404(Product, pk=product_id)
@@ -121,7 +121,7 @@ def get_inventory_detail(request, product_id):
     return Response({'message': 'you do not have permission access this resource'},status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated, HasCompany])
+@permission_classes([IsAuthenticated, HasCompanyOrReadOnly])
 def edit_inventory(request, product_id):
     user = request.user
 
@@ -141,7 +141,7 @@ def edit_inventory(request, product_id):
     return Response({'message': 'you do not have permission to edit this resource'}, status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated, HasCompany])
+@permission_classes([IsAuthenticated, HasCompanyOrReadOnly])
 def new_registry(request):
     user = request.user
     data = request.data
@@ -153,7 +153,7 @@ def new_registry(request):
         return Response(serializer.data)
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated, HasCompany])
+@permission_classes([IsAuthenticated, HasCompanyOrReadOnly])
 def get_registry_detail(request, registry_id):
     user = request.user
     registry =  get_object_or_404(Registry, pk=registry_id)

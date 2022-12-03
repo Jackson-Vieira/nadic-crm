@@ -1,6 +1,5 @@
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework import pagination
 from rest_framework.decorators import action
 from rest_framework import viewsets
 from rest_framework.mixins import (
@@ -12,7 +11,6 @@ from rest_framework.mixins import (
     )
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
-from django_filters import rest_framework as filters
 
 from ...models import Company, Product, Inventory, Registry
 from ..serializers import CompanySerializer, ProductSerializer, RegistrySerializer, InventorySerializer
@@ -24,7 +22,7 @@ class CompanyViewSet(viewsets.ModelViewSet):
     model = Company
     queryset = Company.objects.all()
     serializer_class = CompanySerializer
-    permission_classes = [IsOwnerOrReadOnly, ]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly, ]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

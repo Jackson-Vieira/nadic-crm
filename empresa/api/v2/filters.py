@@ -7,6 +7,8 @@ class ProductFilterSet(filters.FilterSet):
 
     keyword = filters.CharFilter(field_name='name', lookup_expr='icontains')
     
+    # min_inventory_quantity 
+    # max_inventory_quantity
 
     min_price = filters.NumberFilter(field_name='price', lookup_expr='gte')
     max_price = filters.NumberFilter(field_name='price', lookup_expr='lte')

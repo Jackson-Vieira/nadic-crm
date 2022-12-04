@@ -14,11 +14,10 @@ def register_user(request):
     serializer = UserSerializer(data=data)
     username= data.get('email')
     if not User.objects.filter(username=username).exists():
-        if serializer.is_valid():
-            password = data.get('password')
-            serializer.save(username=username, password=make_password(password))
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        password = data.get('password')
+        serializer.save(username=username, password=make_password(password))
+        return Response(serializer.data)
     return Response({'message': 'A User with this email already exists'}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])

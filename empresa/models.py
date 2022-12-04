@@ -6,8 +6,8 @@ class Company(models.Model):
     owner = models.OneToOneField(
         User, 
         related_name='company',
-        on_delete=models.DO_NOTHING,
-        null=False,
+        on_delete=models.SET_NULL,
+        null=True,
         blank=False,
         )
     name = models.CharField(
@@ -22,7 +22,7 @@ class Company(models.Model):
     total_billing  = models.FloatField(default=0)
 
     def __str__(self):
-        return str(self.id)
+        return self.name
 
 class TypeProdutChoices(models.TextChoices):
     GENERIC = 'generic'
@@ -32,7 +32,7 @@ class TypeProdutChoices(models.TextChoices):
 class Product(models.Model):
     company = models.ForeignKey(
         Company,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         null=False,
         blank=False,
     )
@@ -73,20 +73,20 @@ class RegistrySituation(models.TextChoices):
 class Registry(models.Model):
     company = models.ForeignKey(
         Company, 
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         null=False,
         blank=False,
         )
     product = models.ForeignKey(
         Product, 
-        on_delete=models.DO_NOTHING,
+        on_delete=models.PROTECT,
         null=False,
         blank=False,
         )
     product_price = models.FloatField(
         validators=[MinValueValidator(0.1)], # Implement GreaterThanZeroValueValidator
-        null=False,
-        blank=False,
+        null=True,
+        blank=True,
     )
     product_quantity = models.IntegerField(
         validators=[MinValueValidator(1)]
@@ -102,21 +102,11 @@ class Registry(models.Model):
         default=RegistrySituation.PENDING
     )
 
+    product_price = models.FloatField(
+        validators=[MinValueValidator(0.1)], # Implement GreaterThanZeroValueValidator
+        null=True,
+        blank=True,
+    )
+
     def total_price(self):
         return self.product_price * self.product_quantity
-
-# @receiver(pre_save, sender=Order)
-# def registry_order(sender, instance, **kwargs):
-#     inventory = instance.product.inventory
-    
-#     if inventory.quantity >= instance.quantity:
-#         empresa = inventory.empresa
-#         inventory.quantity -= instance.quantity # Diminuir o estoque
-#         empresa.faturamento_total += instance.product.price * instance.quantity # Aumentar faturamento da empresa
-#         empresa.save()
-#         inventory.save()
-#         instance.situation = OrderSituation.approved
-#         return 
-
-#     instance.situation = OrderSituation.rejected
-#     return

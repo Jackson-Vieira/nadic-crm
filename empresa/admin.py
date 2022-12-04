@@ -5,7 +5,8 @@ from .models import Company, Product, Inventory, Registry
 
 @admin.register(Company)
 class CompanyModelAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['name', 'owner', 'total_billing']
+    fields = ['name', 'owner', 'total_billing']
 
 @admin.register(Product)
 class ProductModelAdmin(admin.ModelAdmin):

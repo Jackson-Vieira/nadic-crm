@@ -7,10 +7,10 @@ from rest_framework.decorators import api_view, permission_classes
 
 from django.shortcuts import get_object_or_404
 
-from ..models import Company, Product, Inventory, Registry, RegistrySituation
-from .serializers import CompanySerializer, ProductSerializer, InventorySerializer, RegistrySerializer
-from .utils.validators import user_has_company
-from .permissions import HasCompanyOrReadOnly
+from ...models import Product, Inventory, Registry
+from ..serializers import CompanySerializer, ProductSerializer, InventorySerializer, RegistrySerializer
+from ..utils.validators import user_has_company
+from ..permissions import HasCompanyOrReadOnly
 
 # COMPANY VIEWS
 @api_view(['POST'])
@@ -38,10 +38,12 @@ def get_current_user_company_stats(request):
     user = request.user
     serializer = CompanySerializer(user.company)
 
-    # querys 
-    response = {}
-    
-    return Response(serializer.data)
+    data = {
+        'empresa': serializer.data,
+        'total_billing': user.company.total_billing
+        }
+
+    return Response(data)
    
 @api_view(['GET'])
 @permission_classes([IsAuthenticated, HasCompanyOrReadOnly])
@@ -79,7 +81,7 @@ def get_product_detail(request, product_id):
         return Response(serializer.data)
     return Response({'message': 'you do not have permission access for this resource'},status=status.HTTP_401_UNAUTHORIZED)
     
-@api_view(['POST'])
+@api_view(['PUT'])
 @permission_classes([IsAuthenticated, HasCompanyOrReadOnly])
 def edit_product(request, product_id):
     user = request.user
@@ -93,7 +95,7 @@ def edit_product(request, product_id):
             return Response(serializer.data)
     return Response({'message': 'you do not have permission to edit this resource'},status=status.HTTP_401_UNAUTHORIZED)
 
-@api_view(['GET'])
+@api_view(['DELETE'])
 @permission_classes([IsAuthenticated, HasCompanyOrReadOnly])
 def delete_product(request, product_id):
     user = request.user
@@ -120,7 +122,7 @@ def get_inventory_detail(request, product_id):
         return Response(serializer.data)
     return Response({'message': 'you do not have permission access this resource'},status=status.HTTP_401_UNAUTHORIZED)
 
-@api_view(['POST'])
+@api_view(['PUT'])
 @permission_classes([IsAuthenticated, HasCompanyOrReadOnly])
 def edit_inventory(request, product_id):
     user = request.user
@@ -132,9 +134,6 @@ def edit_inventory(request, product_id):
         data = request.data
         serializer = InventorySerializer(instance=inventory, data=data, many=False)
         if serializer.is_valid(raise_exception=True):
-
-            # não permitir diminuir o estoque para valores negativos
-
             serializer.save()
             return Response(serializer.data)
         
@@ -148,8 +147,7 @@ def new_registry(request):
     serializer = RegistrySerializer(data=data)
     if serializer.is_valid(raise_exception=True):
         product = Product.objects.get(pk=data.get('product'))
-        registry = serializer.save(company=user.company, product_price=product.price)
-
+        serializer.save(company=user.company, product_price=product.price)
         return Response(serializer.data)
 
 @api_view(['GET'])

@@ -13,6 +13,9 @@ from ..permissions import IsOwner, IsOwnerOrReadOnly, HasCompanyOrReadOnly
 from ..utils.validators import user_has_company
 from .pagination import CustomPageNumberPagination, CustomLimitOffsetPagination
 
+
+from django.shortcuts import get_object_or_404
+
 class CompanyViewSet(viewsets.ModelViewSet):
     model = Company
     queryset = Company.objects.all()
@@ -31,6 +34,10 @@ class CompanyViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['GET'], permission_classes=[IsOwner])
     def stats(self, request, pk = None):
         company = self.get_object()
+
+        # OPERATIONS
+        
+
         return Response(
             {
             'stats': {
@@ -87,9 +94,9 @@ class RegistryViewSet(
     filter_backends = [filters.DjangoFilterBackend]
     filterset_class = RegistrysFilterSet
 
-
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(company=request.user.company)
+        product = get_object_or_404(Product, pk=request.data.get('product'))
+        serializer.save(company=request.user.company, product_price=product.price)
         return Response(serializer.data, status=status.HTTP_201_CREATED)

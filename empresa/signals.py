@@ -12,28 +12,29 @@ def create_product_inventory(sender, instance, created, **kwargs):
 @receiver(post_save, sender=Registry)
 def verify_registry(sender, instance, created, **kwargs):
     if created:
-        # idea: celery task
-        # pegar o produto
+        # IDEA: Celery task
+
+        # get product
         registry = instance
         product = registry.product
     
-        # pegar o inventário do produto
+        # get inventory product
         inventory = Inventory.objects.get(pk=product.inventory.id)
 
-        # validar o registro
+        # validate registry
         product_quantity_registry = registry.product_quantity
         if(product_quantity_registry > inventory.quantity):
-            #mudar a situação
+            # change situation
             registry.situation = RegistrySituation.REJECTED
             registry.save()
         else:
-            # pegar a empresa do produto
-            product_company = Company.objects.get(pk=product.company.id)
-            # diminuir o estoque do produto
+            # get the company product
+            product_company = Company.objects.get(pk=product.company.name)
+            # change the product quantity inventory
             inventory.quantity -= product_quantity_registry
             product_company.total_billing += product_quantity_registry*registry.product_price
             inventory.save()
             product_company.save()
-            # mudar a situação
+            # change situation
             registry.situation = RegistrySituation.APPROVED
             registry.save()

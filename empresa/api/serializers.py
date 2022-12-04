@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from ..models import Company, Product, Registry, Inventory
 
-from authentication.serializers import UserSerializer
+from authentication.api.serializers import UserSerializer
 
 class CompanySerializer(serializers.ModelSerializer):
     
@@ -20,10 +20,10 @@ class ProductSerializer(serializers.ModelSerializer):
     inventory = InventorySerializer(read_only=True)
     class Meta:
         model = Product
-        fields = ('id', 'name', 'description', 'price', 'product_type', 'inventory')
+        fields = ('id', 'company', 'name', 'description', 'price', 'product_type', 'inventory')
 
 class RegistrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Registry
-        fields = ('product', 'product_quantity', 'total_price','situation', 'product_price', 'created_at')
+        fields = ('id', 'product', 'product_quantity', 'total_price','situation', 'product_price', 'created_at')
         read_only_fields = ('total_price','situation', 'product_price', 'create_at')

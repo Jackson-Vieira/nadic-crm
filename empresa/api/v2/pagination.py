@@ -11,6 +11,7 @@ class CustomPageNumberPagination(pagination.PageNumberPagination):
                 'next': self.get_next_link(),
                 'previous': self.get_previous_link()
             },
+            'resPerPage': self.page_size,
             'count': self.page.paginator.count,
             'results': data
         })
@@ -20,5 +21,5 @@ class CustomLimitOffsetPagination(pagination.LimitOffsetPagination):
     max_limit = 100
     limit_query_param = 'limit'
     offset_query_param = 'offset'
-
+    
 

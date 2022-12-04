@@ -24,6 +24,9 @@ class Company(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        ordering = ['-name']
+
 class TypeProdutChoices(models.TextChoices):
     GENERIC = 'generic'
     FOOD = 'food'
@@ -39,7 +42,7 @@ class Product(models.Model):
     name = models.CharField('name', max_length=200, unique=True)
     description = models.TextField('description', max_length=200)
     price = models.FloatField(
-        validators=[MinValueValidator(0.1)], # Implement GreaterThanZeroValueValidator
+        validators=[MinValueValidator(0.1)],
         null=False,
         blank=False,
         default=1,
@@ -54,6 +57,9 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        ordering = ['-id']
+
 class Inventory(models.Model):
     product = models.OneToOneField(
         Product,
@@ -65,6 +71,7 @@ class Inventory(models.Model):
         blank=True,
         default=0
         )
+
 
 class RegistrySituation(models.TextChoices):
     APPROVED = 'approved'
@@ -110,3 +117,7 @@ class Registry(models.Model):
 
     def total_price(self):
         return self.product_price * self.product_quantity
+
+
+    class Meta:
+        ordering = ['-id']

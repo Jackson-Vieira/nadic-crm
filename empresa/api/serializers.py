@@ -21,6 +21,7 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ('id', 'company', 'name', 'description', 'price', 'product_type', 'inventory')
+        read_only_fields = ('company',)
 
 class RegistrySerializer(serializers.ModelSerializer):
     class Meta:

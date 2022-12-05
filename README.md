@@ -27,7 +27,7 @@ além de outras features como paginação dos dados, filtros e buscas.
 
 ### Diagrama:
 ![diagrama](public/readme/diagrama.png)
- - Diagrama feito como base no meu entendimento sobre o projeto, desatualizado, devido a algumas alterações, em razão de alguns bugs durante a implementação,.
+ - Diagrama feito como base no meu entendimento sobre o projeto, desatualizado, devido a algumas alterações, em razão de alguns bugs durante a implementação.
 
 ## 🥳 Como rodar o projeto: 
 No Linux:

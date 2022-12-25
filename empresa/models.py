@@ -38,6 +38,7 @@ class Product(models.Model):
         on_delete=models.PROTECT,
         null=False,
         blank=False,
+        related_name='products'
     )
     name = models.CharField('name', max_length=200, unique=True)
     description = models.TextField('description', max_length=200)
@@ -83,6 +84,7 @@ class Registry(models.Model):
         on_delete=models.PROTECT,
         null=False,
         blank=False,
+        related_name='registrys',
         )
     product = models.ForeignKey(
         Product, 
@@ -98,6 +100,9 @@ class Registry(models.Model):
     product_quantity = models.IntegerField(
         validators=[MinValueValidator(1)]
         )
+
+    # total_price = models.FloatField()
+    
     created_at = models.DateTimeField('created at', auto_now_add=True)
 
     situation = models.CharField(
@@ -107,12 +112,6 @@ class Registry(models.Model):
         null=False,
         choices=RegistrySituation.choices,
         default=RegistrySituation.PENDING
-    )
-
-    product_price = models.FloatField(
-        validators=[MinValueValidator(0.1)], # Implement GreaterThanZeroValueValidator
-        null=True,
-        blank=True,
     )
 
     def total_price(self):

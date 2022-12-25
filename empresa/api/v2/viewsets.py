@@ -13,7 +13,7 @@ from ..permissions import IsOwner, IsOwnerOrReadOnly, HasCompanyOrReadOnly
 from ..utils.validators import user_has_company
 from .pagination import CustomPageNumberPagination, CustomLimitOffsetPagination
 
-
+from django.db.models import Sum, Avg, Count, Min, Max, F
 from django.shortcuts import get_object_or_404
 
 class CompanyViewSet(viewsets.ModelViewSet):
@@ -35,15 +35,19 @@ class CompanyViewSet(viewsets.ModelViewSet):
     def stats(self, request, pk = None):
         company = self.get_object()
 
-        # OPERATIONS
-        
+        # QUERIES
+        stats = Company.objects.filter(pk=pk).prefetch_related(
+                'registrys', 'products', 'products__inventory'
+                ) \
+            .annotate(
+                max_registry_price = Max('registrys__product_price'),
+                avg_product_price = Avg('products__price'),
+                min_product_quantity = Min('products__inventory__quantity'),
+            ).values('max_registry_price', 'min_product_quantity', 'total_billing', 'avg_product_price')[0]
 
         return Response(
-            {
-            'stats': {
-                'total_billing': company.total_billing,
-                }
-            },
+                stats
+            ,
             status=status.HTTP_200_OK
         )
 
